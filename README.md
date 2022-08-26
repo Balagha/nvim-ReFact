@@ -1,6 +1,6 @@
-# treesitter-refact-react
+# nvim-ReFact
 
->[Neovim](https://neovim.io/) plugin to deal with [treesitter](https://github.com/tree-sitter/tree-sitter) units.
+>A [Neovim](https://neovim.io/) plugin Inspired by VSCode extension [Glean](https://github.com/wix/vscode-glean)
 
 The plugin provides refactoring tools for your React codebase. Extract JSX into a new component, wrapping with Hooks and more!
 
@@ -17,11 +17,21 @@ The plugin provides refactoring tools for your React codebase. Extract JSX into 
 
 ## Installation
 
+<details>
+	<summary><a href="https://github.com/wbthomason/packer.nvim">Packer.nvim</a></summary>
 
-For [packer](https://github.com/wbthomason/packer.nvim):
+```lua
+use 'tamanna190101/nvim-ReFact'
 ```
-use 'tamanna190101/NVIM-PLUGIN'
+</details>
+<details>
+	<summary><a href="https://github.com/junegunn/vim-plug">vim-plug</a></summary>
+
+```vim
+Plug 'tamanna190101/nvim-ReFact'
 ```
+</details>
+&nbsp;
 
 ## Extracting JSX into a new Component
 
@@ -38,14 +48,38 @@ Examples:
 gif...
 
 ### Useful mappings
+<details>
+	<summary><a href="https://github.com/wbthomason/packer.nvim">init.lua</a></summary>
 
-For init.lua:
+```lua
+vim.api.nvim_set_keymap('n', 'vv', ':lua require"nvim-ReFact".select()<CR>', {noremap=true})
+
+vim.api.nvim_set_keymap('v', 'r', ':lua require"nvim-ReFact".change()<CR>', {noremap=true})
 ```
-vim.api.nvim_set_keymap('n', 'vv', ':lua require"treesitter-refact-react".select()<CR>', {noremap=true})
+</details>
+<details>
+	<summary><a href="https://github.com/wbthomason/packer.nvim">init.vim</a></summary>
 
-vim.api.nvim_set_keymap('v', 'r', ':lua require"treesitter-refact-react".change()<CR>', {noremap=true})
+```vim
+xnoremap vv :lua require"nvim-ReFact".select()<CR>
+
+xnoremap r :lua require"nvim-ReFact".change()<CR>
 ```
+</details>
+&nbsp;
 
+## How to run this project into your machine
+make sure you have fulfilled the [requirements](https://github.com/tamanna190101/nvim-ReFact#requirements) and necessary [key mappings](https://github.com/tamanna190101/nvim-ReFact#useful-mappings)
+```sh
+# clone this repo
+$ git clone https://github.com/tamanna190101/nvim-ReFact.git
+
+$ cd nvim-ReFact
+
+# set runtime path and open lua init.lua file and example.js file for test lua implementation
+$ nvim --cmd "set rtp+=./" lua/nvim-ReFact/init.lua -O example.js
+```
+To setup Neovim Treesitter Playground follow this [link](https://github.com/nvim-treesitter/playground).
 ## Licensing
 
 Licensed under the Apache License. Check the [LICENSE](LICENSE) file for details.
