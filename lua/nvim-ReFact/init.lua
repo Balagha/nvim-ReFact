@@ -2,6 +2,25 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 local Input = require("nui.input")
 local event = require("nui.utils.autocmd").event
 
+local function check_it_has_expression(node)
+	local expr_container = {}
+	local child_list = ts_utils.get_named_children(node)
+	for key,val in pairs(child_list) do
+		if(val ~= nil) then
+		  local returned_arr = check_it_has_expression(val)
+		  for _,v in ipairs(returned_arr) do 
+    		table.insert(expr_container, v)
+			end
+		  if(val:type() == "jsx_expression") then
+		  	local inner_child_list = ts_utils.get_named_children(val)
+        local nodeText = vim.treesitter.get_node_text(val, vim.api.nvim_get_current_buf())
+		    table.insert(expr_container, nodeText)
+		  end
+	  end
+	end
+	return expr_container
+end
+
 local get_input = function(fn)
 	local input = Input({
 		position = "50%",
@@ -81,8 +100,26 @@ local insert_code_into_new_file = function(file_name)
 	local bufnr = vim.api.nvim_get_current_buf()
 	local start_row, start_col, end_row, end_col = node:range()
 	local text = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, end_row, end_col, {})
+	local text = vim.treesitter.get_node_text(node, bufnr)
+	
+	local replaced = "<" .. file_name .. " "
+	local import_statement = "import " .. file_name .. ' from "' .. file_name .. '";'
 
-	local pre_code = "function " .. file_name .. "() {\n  return (\n"
+	local arr = {}
+	arr = check_it_has_expression(node)
+	for k, v in pairs(arr) do
+		local repl = v:gsub("%{", "")
+		repl = repl:gsub("%}","")
+		replaced = replaced .. repl .. "=" .. v
+		repl = "{props." .. repl .. "}"
+		text = text:gsub( v, repl)
+	end
+	replaced = replaced .. "/>"
+
+	vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, { replaced })
+	vim.api.nvim_buf_set_text(bufnr, 0, 0, 0, 0, { import_statement })
+
+	local pre_code = "function " .. file_name .. "(props) {\n  return (\n"
 	local post_code = "  );\n}\n\nexport default " .. file_name .. ";"
 
 	local i = 1
@@ -94,10 +131,7 @@ local insert_code_into_new_file = function(file_name)
 	end
 
 	f:write(pre_code)
-	while text[i] ~= nil do
-		f:write(tostring(text[i]) .. "\n")
-		i = i + 1
-	end
+	f:write(text)
 	f:write(post_code)
 	f:close()
 end
@@ -114,12 +148,8 @@ M.change = function()
 		local bufnr = vim.api.nvim_get_current_buf()
 		local start_row, start_col, end_row, end_col = node:range()
 
-		local replaced = "<" .. file_name .. "/>"
-		local import_statement = "import " .. file_name .. ' from "' .. file_name .. '";'
 		insert_code_into_new_file(file_name)
 
-		vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, { replaced })
-		vim.api.nvim_buf_set_text(bufnr, 0, 0, 0, 0, { import_statement })
 		vim.api.nvim_command("write")
 	end)
 end
