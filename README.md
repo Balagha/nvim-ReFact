@@ -21,14 +21,14 @@ The plugin provides refactoring tools for your React codebase. Extract JSX into 
 	<summary><a href="https://github.com/wbthomason/packer.nvim">Packer.nvim</a></summary>
 
 ```lua
-use 'tamanna190101/nvim-ReFact'
+use 'Balagha/nvim-ReFact'
 ```
 </details>
 <details>
 	<summary><a href="https://github.com/junegunn/vim-plug">vim-plug</a></summary>
 
 ```vim
-Plug 'tamanna190101/nvim-ReFact'
+Plug 'Balagha/nvim-ReFact'
 ```
 </details>
 &nbsp;
